@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas_line</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <canvas id="canvas" width="100" height="100"></canvas>
+    <script>
+        // 获取一个卷轴
+        let canvas = document.querySelector('#canvas');
+        // 获取文档可视区域并赋值
+        canvas.width = document.documentElement.clientWidth;
+        canvas.height = document.documentElement.clientHeight;
+        // 获取卷轴内可绘制的区域（元素渲染上下文）
+        let ctx = canvas.getContext('2d');
+        // 取一根笔，然后在笔上沾个颜色
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+
+        // 开关，用来控制pc端鼠标抬起是否绘制
+        let painting = false;
+        // 记录每一次点的位置
+        let last;
+
+        // 检测是否是pc还是移动端
+        let isTouchDevice = 'ontouchstart' in document.documentElement;
+        if (isTouchDevice) {
+            // 移动端
+            canvas.ontouchstart = (e) => {
+                let x = e.touches[0].clientX;
+                let y = e.touches[0].clientY;
+                last = [x, y];
+            }
+            canvas.ontouchmove = (e)=> {
+                let x = e.touches[0].clientX;
+                let y = e.touches[0].clientY;
+                drawLine(last[0], last[1], x, y);
+                last = [x, y];
+            }
+        }else {
+            // pc端
+            canvas.onmousedown = (e)=> {
+                painting = true;
+                last = [e.clientX, e.clientY];
+            }
+            canvas.onmousemove = (e)=> {
+                if (painting === true) {
+                    drawLine(last[0], last[1], e.clientX, e.clientY);
+                    last = [e.clientX, e.clientY];
+                }
+            }
+            canvas.onmouseup = (e) => {
+                painting = false;
+            }
+        }
+
+        // 沾满颜色的笔，开始绘图
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+
+    </script>
+</body>
+</html>
